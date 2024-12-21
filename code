@@ -1,0 +1,511 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
+
+public class RecyclingApp {
+    private static Scanner scanner = new Scanner(System.in);
+    private static HashMap<String, User> users = new HashMap<>();
+    private static ArrayList<RecyclingCenter> centers = new ArrayList<>();
+// Book.java
+public class Book {
+    private String title;
+    private String author;
+    private boolean isBorrowed;
+
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+        this.isBorrowed = false;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public boolean isBorrowed() {
+        return isBorrowed;
+    }
+
+    public void borrowBook() {
+        isBorrowed = true;
+    }
+
+    public void returnBook() {
+        isBorrowed = false;
+    }
+
+    @Override
+    public String toString() {
+        return "Title: " + title + ", Author: " + author + ", Borrowed: " + isBorrowed;
+    }
+}
+// Member.java
+public class Member {
+    private String name;
+    private int memberId;
+
+    public Member(String name, int memberId) {
+        this.name = name;
+        this.memberId = memberId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getMemberId() {
+        return memberId;
+    }
+
+    @Override
+    public String toString() {
+        return "Name: " + name + ", Member ID: " + memberId;
+    }
+}
+// Library.java
+import java.util.ArrayList;
+import java.util.List;
+
+public class Library {
+    private List<Book> books;
+    private List<Member> members;
+
+    public Library() {
+        books = new ArrayList<>();
+        members = new ArrayList<>();
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void addMember(Member member) {
+        members.add(member);
+    }
+
+    public void borrowBook(String bookTitle, int memberId) {
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(bookTitle) && !book.isBorrowed()) {
+                book.borrowBook();
+                System.out.println("Book borrowed successfully by Member ID: " + memberId);
+                return;
+            }
+        }
+        System.out.println("Book is not available.");
+    }
+
+    public void returnBook(String bookTitle) {
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(bookTitle) && book.isBorrowed()) {
+                book.returnBook();
+                System.out.println("Book returned successfully.");
+                return;
+            }
+        }
+        System.out.println("Book not found or not borrowed.");
+    }
+
+    public void listBooks() {
+        for (Book book : books) {
+            System.out.println(book);
+        }
+    }
+
+    public void listMembers() {
+        for (Member member : members) {
+            System.out.println(member);
+        }
+    }
+
+    public static void main(String[] args) {
+        Library library = new Library();
+        library.addBook(new Book("1984", "George Orwell"));
+        library.addBook(new Book("To Kill a Mockingbird", "Harper Lee"));
+        
+        library.addMember(new Member("Alice", 1));
+        library.addMember(new Member("Bob", 2));
+
+        library.listBooks();
+        library.listMembers();
+
+        library.borrowBook("1984", 1);
+        library.listBooks();
+
+        library.returnBook("1984");
+        library.listBooks();
+    }
+}
+
+
+    public static void main(String[] args) {
+        initializeCenters();
+        boolean running = true;
+
+        while (running) {
+            System.out.println("Welcome to the Recycling App!");
+            System.out.println("1. Register");
+            System.out.println("2. Login");
+            System.out.println("3. Exit");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    register();
+                    break;
+                case 2:
+                    login();
+                    break;
+                case 3:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+        System.out.println("Thank you for using the Recycling App!");
+    }
+
+    private static void register() {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        if (users.containsKey(username)) {
+            System.out.println("Username already taken. Please choose another one.");
+        } else {
+            users.put(username, new User(username, password));
+            System.out.println("Registration successful!");
+        }
+    }
+
+    private static void login() {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        User user = users.get(username);
+        if (user != null && user.getPassword().equals(password)) {
+            System.out.println("Login successful!");
+            userMenu(user);
+        } else {
+            System.out.println("Invalid username or password. Please try again.");
+        }
+    }
+
+    private static void userMenu(User user) {
+        boolean loggedIn = true;
+
+        while (loggedIn) {
+            System.out.println("Welcome, " + user.getUsername() + "!");
+            System.out.println("1. Locate Recycling Center");
+            System.out.println("2. Logout");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    locateCenter();
+                    break;
+                case 2:
+                    loggedIn = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void locateCenter() {
+        System.out.print("Enter your location: ");
+        String location = scanner.nextLine();
+        System.out.println("Recycling Centers near " + location + ":");
+
+        for (RecyclingCenter center : centers) {
+            System.out.println(center);
+        }
+    }
+
+    private static void initializeCenters() {
+        centers.add(new RecyclingCenter("Center 1", "123 Main St", "Glass, Plastic, Metal"));
+        centers.add(new RecyclingCenter("Center 2", "456 Elm St", "Paper, Plastic"));
+        centers.add(new RecyclingCenter("Center 3", "789 Oak St", "Electronics, Metal"));
+    }
+}
+
+class User {
+    private String username;
+    private String password;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
+
+class RecyclingCenter {
+    private String name;
+    private String address;
+    private String acceptedMaterials;
+
+    public RecyclingCenter(String name, String address, String acceptedMaterials) {
+        this.name = name;
+        this.address = address;
+        this.acceptedMaterials = acceptedMaterials;
+    }
+
+    @Override
+    public String toString() {
+        return "Name: " + name + ", Address: " + address + ", Accepted Materials: " + acceptedMaterials;
+    }
+}
+package com.example.coffee.model;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Coffee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String name;
+    private String description;
+
+    public Coffee() {}
+
+    public Coffee(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+package com.example.coffee.repository;
+
+import com.example.coffee.model.Coffee;
+import org.springframework.data.repository.CrudRepository;
+
+public interface CoffeeRepository extends CrudRepository<Coffee, Long> {
+}
+package com.example.coffee.service;
+
+import com.example.coffee.model.Coffee;
+import com.example.coffee.repository.CoffeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CoffeeService {
+
+    @Autowired
+    private CoffeeRepository coffeeRepository;
+
+    public Iterable<Coffee> getAllCoffees() {
+        return coffeeRepository.findAll();
+    }
+
+    public Coffee getCoffeeById(Long id) {
+        return coffeeRepository.findById(id).orElse(null);
+    }
+
+    public Coffee addCoffee(Coffee coffee) {
+        return coffeeRepository.save(coffee);
+    }
+}
+package com.example.coffee.controller;
+
+import com.example.coffee.model.Coffee;
+import com.example.coffee.service.CoffeeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping("/coffees")
+public class CoffeeController {
+
+    @Autowired
+    private CoffeeService coffeeService;
+
+    @GetMapping
+    public String getAllCoffees(Model model) {
+        model.addAttribute("coffees", coffeeService.getAllCoffees());
+        return "coffees";
+    }
+
+    @GetMapping("/{id}")
+    public String getCoffeeById(@PathVariable Long id, Model model) {
+        model.addAttribute("coffee", coffeeService.getCoffeeById(id));
+        return "coffee";
+    }
+
+    @PostMapping
+    public String addCoffee(@ModelAttribute Coffee coffee) {
+        coffeeService.addCoffee(coffee);
+        return "redirect:/coffees";
+    }
+}
+package com.example.coffee;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CoffeeWebsiteApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(CoffeeWebsiteApplication.class, args);
+    }
+}
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+public class SimpleGame extends JPanel implements ActionListener, KeyListener {
+    private Timer timer;
+    private int playerX;
+    private int playerY;
+    private final int playerWidth = 50;
+    private final int playerHeight = 50;
+    private final int windowWidth = 800;
+    private final int windowHeight = 600;
+    private boolean moveLeft, moveRight;
+
+    public SimpleGame() {
+        this.setPreferredSize(new Dimension(windowWidth, windowHeight));
+        this.setBackground(Color.BLACK);
+        this.setFocusable(true);
+        this.addKeyListener(this);
+
+        playerX = windowWidth / 2 - playerWidth / 2;
+        playerY = windowHeight - playerHeight - 30;
+
+        timer = new Timer(10, this);
+        timer.start();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        drawPlayer(g);
+    }
+
+    private void drawPlayer(Graphics g) {
+        g.setColor(Color.RED);
+        g.fillRect(playerX, playerY, playerWidth, playerHeight);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        updatePlayer();
+        repaint();
+    }
+
+    private void updatePlayer() {
+        if (moveLeft && playerX > 0) {
+            playerX -= 5;
+        }
+        if (moveRight && playerX < windowWidth - playerWidth) {
+            playerX += 5;
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT) {
+            moveLeft = true;
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            moveRight = true;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT) {
+            moveLeft = false;
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            moveRight = false;
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Simple Game");
+        SimpleGame game = new SimpleGame();
+        frame.add(game);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+class Solution {
+    public String getPermutation(int n, int k) {
+        StringBuilder ans = new StringBuilder();
+        boolean[] vis = new boolean[n + 1];
+        for (int i = 0; i < n; ++i) {
+            int fact = 1;
+            for (int j = 1; j < n - i; ++j) {
+                fact *= j;
+            }
+            for (int j = 1; j <= n; ++j) {
+                if (!vis[j]) {
+                    if (k > fact) {
+                        k -= fact;
+                    } else {
+                        ans.append(j);
+                        vis[j] = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return ans.toString();
+    }
+}
